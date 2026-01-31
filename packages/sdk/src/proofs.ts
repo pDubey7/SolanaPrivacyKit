@@ -1,15 +1,11 @@
-/**
- * Proof types and placeholder for ZK proof verification
- */
+import { getDefaultClient } from "./client.js";
 
 /**
- * Placeholder: verify a ZK proof against public inputs.
- * Returns a mock result for now.
+ * Verify a ZK proof against public inputs (uses client backend).
  */
 export async function verifyZKProof(
   proof: string | Buffer,
   publicInputs: string[]
 ): Promise<boolean> {
-  await Promise.resolve(); // stub
-  return Boolean(proof && publicInputs?.length >= 0);
+  return getDefaultClient().backend.verifyProof(proof, publicInputs);
 }

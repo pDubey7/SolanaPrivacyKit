@@ -2,6 +2,8 @@
 
 Monorepo for the Solana Privacy Devkit: SDK, CLI, and demo app.
 
+**This project is devnet-only.** Mainnet is not supported; all RPC and config default to Solana devnet.
+
 ## Structure
 
 - **packages/sdk** – TypeScript SDK for privacy-preserving Solana operations (builds with `tsc`)

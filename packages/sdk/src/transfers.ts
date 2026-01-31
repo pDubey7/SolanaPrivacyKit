@@ -1,51 +1,28 @@
+import { getDefaultClient } from "./client.js";
+import type { ShieldResult, TransferResult, UnshieldResult } from "./interfaces.js";
+
+export type { ShieldResult, TransferResult, UnshieldResult } from "./interfaces.js";
+
 /**
- * Transfer-related types and placeholder functions for privacy-preserving transfers
+ * Shield an amount of a token into a private pool (uses client backend).
  */
-
-export interface ShieldResult {
-  success: boolean;
-  txId?: string;
-  commitment?: string;
-}
-
-export interface TransferResult {
-  success: boolean;
-  signature?: string;
-  slot?: number;
+export async function shieldAmount(amount: number, token: string): Promise<ShieldResult> {
+  return getDefaultClient().backend.shieldAmount(amount, token);
 }
 
 /**
- * Placeholder: shield an amount of a token into a private pool.
- * Returns a mock result for now.
- */
-export async function shieldAmount(
-  _amount: number,
-  _token: string
-): Promise<ShieldResult> {
-  await Promise.resolve(); // stub
-  void _amount;
-  void _token;
-  return {
-    success: true,
-    txId: "stub-tx-shield",
-    commitment: "stub-commitment",
-  };
-}
-
-/**
- * Placeholder: create a private transfer to a recipient.
- * Returns a mock result for now.
+ * Create a private transfer to a recipient (uses client backend).
  */
 export async function createPrivateTransfer(
-  _recipient: string,
-  _amount: number
+  recipient: string,
+  amount: number
 ): Promise<TransferResult> {
-  await Promise.resolve(); // stub
-  void _recipient;
-  void _amount;
-  return {
-    success: true,
-    signature: "stub-signature",
-    slot: 0,
-  };
+  return getDefaultClient().backend.createPrivateTransfer(recipient, amount);
+}
+
+/**
+ * Unshield an amount of a token from a private pool (uses client backend).
+ */
+export async function unshieldAmount(amount: number, token: string): Promise<UnshieldResult> {
+  return getDefaultClient().backend.unshieldAmount(amount, token);
 }
