@@ -11,7 +11,7 @@ export default function Home() {
   const [shieldResult, setShieldResult] = useState<{ success: boolean; txId?: string } | null>(null);
   const [shieldLoading, setShieldLoading] = useState(false);
 
-  const [shieldedBalance, setShieldedBalance] = useState<string | null>(null);
+  const [shieldedBalance, _setShieldedBalance] = useState<string | null>(null);
 
   const [transferRecipient, setTransferRecipient] = useState("");
   const [transferAmount, setTransferAmount] = useState("");

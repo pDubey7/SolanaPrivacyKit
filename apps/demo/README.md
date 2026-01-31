@@ -1,18 +1,23 @@
- # Solana Privacy Devkit — Demo App
+# Solana Privacy Devkit — Demo App
 
 Next.js 14+ demo for the Privacy Devkit: connect Phantom (devnet), shield, transfer, and verify proofs via API routes.
 
 ## Run locally
 
-```bash
-# From repo root (recommended: install all workspaces first)
-pnpm install
-pnpm run build:sdk
+From repo root (install and build once):
 
-# From apps/demo
+```bash
+npm install
+npm run build:sdk
+npm run dev
+```
+
+Or from this directory:
+
+```bash
 cd apps/demo
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).

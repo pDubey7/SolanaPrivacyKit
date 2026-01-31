@@ -22,6 +22,7 @@ function createBackend(name: PrivacyBackend, config: Config): PrivacyBackendInst
         wallet,
         apiKey: config.shadowwireApiKey,
         apiBaseUrl: undefined,
+        network: config.network,
       });
     }
     case "arcium":

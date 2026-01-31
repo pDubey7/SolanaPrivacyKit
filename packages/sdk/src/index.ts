@@ -3,6 +3,7 @@ export {
   loadFromEnv,
   DEFAULT_RPC_URL,
   DEFAULT_NETWORK,
+  MAINNET_RPC_URL,
   type Config,
 } from "./config.js";
 export {

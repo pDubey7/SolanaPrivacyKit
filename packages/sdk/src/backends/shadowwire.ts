@@ -21,6 +21,8 @@ export interface ShadowWireBackendConfig {
   apiKey?: string;
   /** Optional custom API base URL */
   apiBaseUrl?: string;
+  /** Network: "devnet" or "mainnet-beta" (defaults to mainnet-beta) */
+  network?: "devnet" | "mainnet-beta";
 }
 
 /**
@@ -38,10 +40,21 @@ export class ShadowWireBackend implements PrivateTransferProvider, ZKVerifier {
 
   constructor(config: ShadowWireBackendConfig) {
     this.wallet = config.wallet;
+    const network = config.network ?? "mainnet-beta";
+
+    // ShadowWire currently only supports mainnet-beta
+    // If devnet is requested, warn the user
+    if (network === "devnet") {
+      console.warn(
+        "[ShadowWire] Warning: ShadowWire SDK currently targets mainnet-beta. " +
+        "Devnet support may be limited. Proceeding with mainnet-beta configuration."
+      );
+    }
+
     this.client = new ShadowWireClient({
       apiKey: config.apiKey,
       apiBaseUrl: config.apiBaseUrl,
-      network: "mainnet-beta",
+      network: "mainnet-beta", // ShadowWire SDK only supports mainnet-beta
       debug: false,
     });
   }

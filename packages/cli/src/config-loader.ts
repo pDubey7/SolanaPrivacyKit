@@ -36,12 +36,14 @@ export function loadConfig(): Config | null {
       shadowwireApiKey?: string;
       shadowwireWallet?: string;
     };
-    return {
+    const network = (data.network === "mainnet-beta" ? "mainnet-beta" : "devnet") as "devnet" | "mainnet-beta";
+    const config: Config = {
       rpcUrl: data.rpcUrl ?? "https://api.devnet.solana.com",
-      network: "devnet",
+      network,
       ...(data.shadowwireApiKey ? { shadowwireApiKey: data.shadowwireApiKey } : {}),
       ...(data.shadowwireWallet ? { shadowwireWallet: data.shadowwireWallet } : {}),
     };
+    return config;
   } catch {
     return null;
   }

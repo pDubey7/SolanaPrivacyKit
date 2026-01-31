@@ -8,6 +8,7 @@ import {
   verifyZKProof,
   loadFromEnv,
   DEFAULT_RPC_URL,
+  MAINNET_RPC_URL,
   PrivacyClient,
   setDefaultClient,
   type Config,
@@ -25,12 +26,13 @@ function getConfig(opts: {
 }): Config {
   const file = loadConfig();
   const env = loadFromEnv();
+  const network = (opts.network ?? file?.network ?? env.network ?? "devnet") as "devnet" | "mainnet-beta";
   const rpcUrl = opts.rpcUrl ?? file?.rpcUrl ?? env.rpcUrl ?? DEFAULT_RPC_URL;
   const shadowwireApiKey = opts.shadowwireApiKey ?? file?.shadowwireApiKey ?? env.shadowwireApiKey;
   const shadowwireWallet = opts.shadowwireWallet ?? file?.shadowwireWallet ?? env.shadowwireWallet;
   return {
     rpcUrl,
-    network: "devnet",
+    network: network === "mainnet-beta" ? "mainnet-beta" : "devnet",
     ...(shadowwireApiKey ? { shadowwireApiKey } : {}),
     ...(shadowwireWallet ? { shadowwireWallet } : {}),
   };
@@ -52,20 +54,25 @@ function ensureBackend(opts: {
 
 program
   .name("privacy")
-  .description("Solana Privacy Devkit CLI (devnet only)")
+  .description("Solana Privacy Devkit CLI (supports devnet and mainnet-beta)")
   .version("1.0.0");
 
 program
   .command("init")
   .description("Create .privacy/config.json with rpcUrl, network, optional ShadowWire")
-  .option("-r, --rpc-url <url>", "Devnet RPC URL", DEFAULT_RPC_URL)
-  .option("-n, --network <name>", "Network (devnet only)", "devnet")
+  .option("-r, --rpc-url <url>", "RPC URL (defaults based on network)")
+  .option("-n, --network <name>", "Network: devnet | mainnet-beta", "devnet")
   .option("--shadowwire-api-key <key>", "ShadowWire API key (optional)")
   .option("--shadowwire-wallet <address>", "ShadowWire wallet for deposit/transfer")
   .action((opts) => {
-    const rpcUrl = opts.rpcUrl ?? DEFAULT_RPC_URL;
-    const network = (opts.network === "devnet" ? "devnet" : "devnet") as "devnet";
+    const network = (opts.network === "mainnet-beta" ? "mainnet-beta" : "devnet") as "devnet" | "mainnet-beta";
+    const rpcUrl = opts.rpcUrl ?? (network === "mainnet-beta" ? MAINNET_RPC_URL : DEFAULT_RPC_URL);
     const dir = process.cwd();
+
+    if (network === "mainnet-beta") {
+      console.log(chalk.yellow("⚠️  WARNING: Configuring for MAINNET-BETA. Real funds will be used!"));
+    }
+
     writeConfig(dir, {
       rpcUrl,
       network,
@@ -84,7 +91,7 @@ program
   .description("Shield amount of token (calls SDK shieldAmount)")
   .option("--backend <name>", "Backend: mock | shadowwire", "mock")
   .option("--rpc-url <url>", "Override RPC URL")
-  .option("--network <name>", "Override network (devnet only)")
+  .option("--network <name>", "Override network: devnet | mainnet-beta")
   .action(
     async (
       amountStr: string,
@@ -117,7 +124,7 @@ program
   .description("Create private transfer (calls SDK createPrivateTransfer)")
   .option("--backend <name>", "Backend: mock | shadowwire", "mock")
   .option("--rpc-url <url>", "Override RPC URL")
-  .option("--network <name>", "Override network (devnet only)")
+  .option("--network <name>", "Override network: devnet | mainnet-beta")
   .action(
     async (
       recipient: string,
@@ -149,7 +156,7 @@ program
   .option("--backend <name>", "Backend: mock | shadowwire", "mock")
   .option("--public-inputs <inputs>", "Comma-separated public inputs (optional)")
   .option("--rpc-url <url>", "Override RPC URL")
-  .option("--network <name>", "Override network (devnet only)")
+  .option("--network <name>", "Override network: devnet | mainnet-beta")
   .action(
     async (
       proofArg: string,

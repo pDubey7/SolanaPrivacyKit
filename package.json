@@ -11,8 +11,14 @@
     "build": "npm run build --workspaces --if-present",
     "build:sdk": "npm run build -w @privacy-devkit/sdk",
     "build:cli": "npm run build -w @privacy-devkit/cli",
+    "cli": "node packages/cli/dist/index.js",
+    "dev": "npm run dev -w demo",
     "dev:demo": "npm run dev -w demo"
   },
   "keywords": ["solana", "privacy", "monorepo"],
-  "license": "MIT"
+  "license": "MIT",
+  "overrides": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
 }
