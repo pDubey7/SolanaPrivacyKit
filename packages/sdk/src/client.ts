@@ -1,24 +1,20 @@
-import type { PrivacyDevkitConfig } from "./config.js";
+import { Connection, PublicKey } from "@solana/web3.js";
+import type { Config } from "./config.js";
 
 /**
- * Privacy devkit client for Solana
+ * Privacy client for Solana (uses @solana/web3.js Connection)
  */
-export class PrivacyDevkitClient {
-  private config: PrivacyDevkitConfig;
+export class PrivacyClient {
+  readonly connection: Connection;
 
-  constructor(config: PrivacyDevkitConfig) {
-    this.config = config;
+  constructor(config: Config) {
+    this.connection = new Connection(config.rpcUrl);
   }
 
-  getRpcUrl(): string {
-    return this.config.rpcUrl;
-  }
-
-  getCommitment() {
-    return this.config.commitment ?? "confirmed";
-  }
-
-  getNetwork() {
-    return this.config.network ?? "mainnet-beta";
+  /**
+   * Get balance in lamports for a public key.
+   */
+  async getBalance(publicKey: PublicKey): Promise<number> {
+    return this.connection.getBalance(publicKey);
   }
 }

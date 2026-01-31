@@ -1,16 +1,14 @@
-export { PrivacyDevkitClient } from "./client.js";
+export { PrivacyClient } from "./client.js";
 export {
+  loadFromEnv,
   DEFAULT_RPC_URL,
-  DEFAULT_CONFIG,
-  type PrivacyDevkitConfig,
+  DEFAULT_NETWORK,
+  type Config,
 } from "./config.js";
 export {
-  createTransferOptions,
-  type TransferOptions,
+  shieldAmount,
+  createPrivateTransfer,
+  type ShieldResult,
   type TransferResult,
 } from "./transfers.js";
-export {
-  createProofInput,
-  type ProofInput,
-  type ProofResult,
-} from "./proofs.js";
+export { verifyZKProof } from "./proofs.js";

@@ -1,23 +1,15 @@
 /**
- * Proof types and utilities for privacy-preserving proofs
+ * Proof types and placeholder for ZK proof verification
  */
-export interface ProofInput {
-  /** Public inputs for the proof */
-  publicInputs: string[];
-  /** Private inputs (not revealed) */
-  privateInputs?: string[];
-}
-
-export interface ProofResult {
-  /** Serialized proof bytes (base64) */
-  proof: string;
-  /** Public inputs revealed with the proof */
-  publicInputs: string[];
-}
 
 /**
- * Placeholder for proof generation/verification
+ * Placeholder: verify a ZK proof against public inputs.
+ * Returns a mock result for now.
  */
-export function createProofInput(publicInputs: string[]): ProofInput {
-  return { publicInputs };
+export async function verifyZKProof(
+  proof: string | Buffer,
+  publicInputs: string[]
+): Promise<boolean> {
+  await Promise.resolve(); // stub
+  return Boolean(proof && publicInputs?.length >= 0);
 }
