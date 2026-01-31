@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # privacy-devkit-solana
 
 Monorepo for the Solana Privacy Devkit: SDK, CLI, and demo app.
@@ -53,4 +52,3 @@ MIT
 =======
 # SolanaPrivacyKit
 Privacy DevKit for Solana – developer toolkit for plug-and-play privacy
->>>>>>> b1ac4562da0a8f8eb38a543b2dab9e61c5f37849
