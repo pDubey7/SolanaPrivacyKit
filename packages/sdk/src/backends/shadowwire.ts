@@ -1,6 +1,8 @@
 import {
   ShadowWireClient,
   TokenUtils,
+  verifyRangeProof,
+  initWASM,
   type TokenSymbol,
 } from "@radr/shadowwire";
 import type {
@@ -10,6 +12,7 @@ import type {
   TransferResult,
   UnshieldResult,
 } from "../interfaces.js";
+import { validateProofFormat } from "../proof-utils.js";
 
 export interface ShadowWireBackendConfig {
   /** Wallet address for deposit/withdraw/transfer */
@@ -26,7 +29,7 @@ export interface ShadowWireBackendConfig {
  * - shieldAmount: deposit() → returns unsigned tx (base64); caller must sign and send.
  * - createPrivateTransfer: transfer() with type 'internal' (amount in lamports, converted to human for SDK).
  * - unshieldAmount: withdraw().
- * ZKVerifier.verifyProof is stubbed (ShadowWire client does not expose a public verify API).
+ * ZKVerifier.verifyProof: when publicInputs[0] is commitment (hex), uses Bulletproofs verifyRangeProof; else format-only stub.
  * Note: @radr/shadowwire uses network 'mainnet-beta'; when Radr supports devnet, apiBaseUrl can be set.
  */
 export class ShadowWireBackend implements PrivateTransferProvider, ZKVerifier {
@@ -93,8 +96,13 @@ export class ShadowWireBackend implements PrivateTransferProvider, ZKVerifier {
     };
   }
 
-  async verifyProof(_proof: string | Buffer, _publicInputs: string[]): Promise<boolean> {
-    // ShadowWire client does not expose a public verifyProof API; use mock backend for verification
-    return true;
+  async verifyProof(proof: string | Buffer, publicInputs: string[]): Promise<boolean> {
+    if (publicInputs.length >= 1) {
+      const proofStr = typeof proof === "string" ? proof : Buffer.from(proof).toString("hex");
+      const commitmentStr = publicInputs[0];
+      await initWASM();
+      return verifyRangeProof(proofStr, commitmentStr);
+    }
+    return validateProofFormat(proof, publicInputs);
   }
 }

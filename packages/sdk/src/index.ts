@@ -20,4 +20,4 @@ export {
   type TransferResult,
   type UnshieldResult,
 } from "./transfers.js";
-export { verifyZKProof } from "./proofs.js";
+export { verifyZKProof, validateProofFormat } from "./proofs.js";

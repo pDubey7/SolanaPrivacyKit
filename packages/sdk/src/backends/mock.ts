@@ -5,6 +5,7 @@ import type {
   TransferResult,
   UnshieldResult,
 } from "../interfaces.js";
+import { validateProofFormat } from "../proof-utils.js";
 
 /**
  * Mock backend implementing PrivateTransferProvider and ZKVerifier.
@@ -39,9 +40,10 @@ export class MockBackend implements PrivateTransferProvider, ZKVerifier {
   }
 
   async verifyProof(proof: string | Buffer, publicInputs: string[]): Promise<boolean> {
+    const valid = validateProofFormat(proof, publicInputs);
     console.log(
-      `[MockBackend] Would verify proof (length=${typeof proof === "string" ? proof.length : proof.length}, publicInputs=${publicInputs.length})`
+      `[MockBackend] Verify proof format: ${valid ? "valid" : "invalid"} (proof length=${typeof proof === "string" ? proof.length : proof.length}, publicInputs=${publicInputs.length})`
     );
-    return Boolean(proof && publicInputs.length >= 0);
+    return valid;
   }
 }

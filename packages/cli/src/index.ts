@@ -145,7 +145,7 @@ program
 
 program
   .command("verify <proof>")
-  .description("Verify ZK proof (proof as hex string or file path)")
+  .description("Verify ZK proof (proof: hex string, or path to .json / .bin file)")
   .option("--backend <name>", "Backend: mock | shadowwire", "mock")
   .option("--public-inputs <inputs>", "Comma-separated public inputs (optional)")
   .option("--rpc-url <url>", "Override RPC URL")
@@ -156,13 +156,28 @@ program
       opts: { backend?: string; publicInputs?: string; rpcUrl?: string; network?: string }
     ) => {
       ensureBackend(opts);
-    let proof: string | Buffer;
-    if (existsSync(proofArg)) {
-      proof = readFileSync(proofArg);
-    } else {
-      proof = proofArg;
-    }
-      const publicInputs = opts.publicInputs ? opts.publicInputs.split(",").map((s) => s.trim()) : [];
+      let proof: string | Buffer;
+      let publicInputs: string[] = opts.publicInputs
+        ? opts.publicInputs.split(",").map((s) => s.trim())
+        : [];
+      if (existsSync(proofArg)) {
+        if (proofArg.endsWith(".json")) {
+          const data = JSON.parse(readFileSync(proofArg, "utf-8")) as {
+            proof?: string;
+            commitment?: string;
+            publicInputs?: string[];
+          };
+          proof = data.proof ?? "";
+          publicInputs =
+            data.publicInputs ?? (data.commitment != null ? [data.commitment] : []);
+        } else if (proofArg.endsWith(".bin")) {
+          proof = readFileSync(proofArg);
+        } else {
+          proof = readFileSync(proofArg);
+        }
+      } else {
+        proof = proofArg;
+      }
       try {
         const ok = await verifyZKProof(proof, publicInputs);
         if (ok) {
