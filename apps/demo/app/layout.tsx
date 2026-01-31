@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { WalletProviderWrapper } from "@/components/WalletProvider";
 
 export const metadata: Metadata = {
   title: "Solana Privacy Devkit Demo",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="min-h-screen antialiased">
+        <WalletProviderWrapper>{children}</WalletProviderWrapper>
+      </body>
     </html>
   );
 }
