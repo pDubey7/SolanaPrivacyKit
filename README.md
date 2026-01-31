@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # privacy-devkit-solana
 
 Monorepo for the Solana Privacy Devkit: SDK, CLI, and demo app.
@@ -49,3 +50,7 @@ This repo uses [npm workspaces](https://docs.npmjs.com/cli/v8/using-npm/workspac
 ## License
 
 MIT
+=======
+# SolanaPrivacyKit
+Privacy DevKit for Solana – developer toolkit for plug-and-play privacy
+>>>>>>> b1ac4562da0a8f8eb38a543b2dab9e61c5f37849
