@@ -11,6 +11,7 @@ export {
   type PrivacyBackend,
 } from "./interfaces.js";
 export { MockBackend } from "./backends/mock.js";
+export { ShadowWireBackend, type ShadowWireBackendConfig } from "./backends/shadowwire.js";
 export {
   shieldAmount,
   createPrivateTransfer,

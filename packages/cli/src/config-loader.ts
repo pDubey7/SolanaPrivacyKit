@@ -30,10 +30,17 @@ export function loadConfig(): Config | null {
   const path = join(dir, CONFIG_FILE);
   try {
     const raw = readFileSync(path, "utf-8");
-    const data = JSON.parse(raw) as { rpcUrl?: string; network?: string };
+    const data = JSON.parse(raw) as {
+      rpcUrl?: string;
+      network?: string;
+      shadowwireApiKey?: string;
+      shadowwireWallet?: string;
+    };
     return {
       rpcUrl: data.rpcUrl ?? "https://api.devnet.solana.com",
       network: "devnet",
+      ...(data.shadowwireApiKey ? { shadowwireApiKey: data.shadowwireApiKey } : {}),
+      ...(data.shadowwireWallet ? { shadowwireWallet: data.shadowwireWallet } : {}),
     };
   } catch {
     return null;
@@ -43,7 +50,15 @@ export function loadConfig(): Config | null {
 /**
  * Write config to .privacy/config.json in the given directory.
  */
-export function writeConfig(dir: string, config: { rpcUrl: string; network: string }): void {
+export function writeConfig(
+  dir: string,
+  config: {
+    rpcUrl: string;
+    network: string;
+    shadowwireApiKey?: string;
+    shadowwireWallet?: string;
+  }
+): void {
   const fullDir = join(dir, CONFIG_DIR);
   mkdirSync(fullDir, { recursive: true });
   const path = join(fullDir, CONFIG_FILE);

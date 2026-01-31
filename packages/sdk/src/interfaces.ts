@@ -5,6 +5,8 @@ export interface ShieldResult {
   success: boolean;
   txId?: string;
   commitment?: string;
+  /** Base64-encoded unsigned transaction (e.g. ShadowWire deposit); caller must sign and send */
+  unsignedTransaction?: string;
 }
 
 export interface TransferResult {
