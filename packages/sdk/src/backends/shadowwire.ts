@@ -69,9 +69,10 @@ export class ShadowWireBackend implements PrivateTransferProvider, ZKVerifier {
 
   async shieldAmount(amount: number, token: string): Promise<ShieldResult> {
     this.assertToken(token);
+    const amountLamports = TokenUtils.toSmallestUnit(amount, token);
     const res = await this.client.deposit({
       wallet: this.wallet,
-      amount,
+      amount: amountLamports,
     });
     return {
       success: res.success,

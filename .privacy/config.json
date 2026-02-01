@@ -1,4 +1,5 @@
 {
-  "rpcUrl": "https://api.devnet.solana.com",
-  "network": "devnet"
+  "rpcUrl": "https://api.mainnet-beta.solana.com",
+  "network": "mainnet-beta",
+  "shadowwireWallet": "7ZbjpECiRky7k3Ch8SpKJhxVdtGkQfzXMycCF37tDFh4"
 }

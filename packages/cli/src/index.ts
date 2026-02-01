@@ -2,6 +2,12 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { readFileSync, existsSync } from "fs";
+import { createRequire } from "module";
+
+// Polyfill require for dependencies (like WASM loaders) that expect it
+if (typeof require === "undefined") {
+  (globalThis as any).require = createRequire(import.meta.url);
+}
 import {
   shieldAmount,
   createPrivateTransfer,
