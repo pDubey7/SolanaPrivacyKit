@@ -36,3 +36,6 @@ coverage/
 # Anchor / Rust
 target/
 .anchor/
+
+# Local privacy config
+.privacy/

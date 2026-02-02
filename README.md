@@ -1,97 +1,121 @@
-# privacy-devkit-solana
+# Solana Privacy Devkit 🛡️
 
-Monorepo for the Solana Privacy Devkit: SDK, CLI, demo app, and a minimal Anchor program. **Supports both devnet (testing) and mainnet-beta (production with ShadowWire).**
+A comprehensive developer kit for building privacy-preserving applications on Solana. This monorepo includes a TypeScript SDK, a Command Line Interface (CLI), an Anchor program, and a full-featured demo application. 
 
-> ⚠️ **MAINNET WARNING**: Mainnet operations use real funds. Always test on devnet first. See [MAINNET_MIGRATION_GUIDE.md](MAINNET_MIGRATION_GUIDE.md) for safe migration instructions.
+**Supports both Devnet (Testing) and Mainnet-Beta (Production with ShadowWire).**
 
-## Structure
+---
 
-- **packages/sdk** – TypeScript SDK (shield, private transfer, ZK proof verification; mock + ShadowWire backends)
-- **packages/cli** – CLI (Commander.js): `privacy init | shield | transfer | verify`
-- **apps/demo** – Next.js 14+ demo (Phantom, Tailwind, API routes for shield/transfer/verify)
-- **programs/** – Minimal Anchor program (deploy to devnet)
+## 🚀 Quick Start
 
-## Prerequisites
+### 1. Prerequisites
+- **Node.js**: 18.x or higher
+- **npm**: 9.x or higher (for workspaces support)
+- **Solana CLI**: (Optional, for managing local keys)
+- **Anchor CLI**: (Optional, for building/deploying the program)
 
-- Node.js 18+
-- npm 9+ (workspaces)
-- (Optional) Rust, Solana CLI, Anchor CLI for building/deploying the program
-
-## Installation
-
+### 2. Installation
+Clone the repository and install dependencies using npm workspaces:
 ```bash
 git clone <repo-url>
-cd privacy-devkit-solana
+cd SolanaPrivacyDevkit
 npm install
 ```
 
-## Build
-
-Build all workspaces (SDK, CLI, demo app):
-
+### 3. Build the Project
+Build all packages (SDK, CLI, and Demo App) in one command:
 ```bash
 npm run build
 ```
 
-Or build individually:
+---
 
+## 💻 Command Line Interface (CLI)
+
+The CLI is the easiest way to interact with the privacy protocols.
+
+### Configuration
+Initialize your local configuration (`.privacy/config.json`). This sets your RPC and network preference.
+
+**Devnet (Default):**
 ```bash
-npm run build:sdk
-npm run build:cli
-```
-
-## CLI
-
-After building, run the CLI:
-
-```bash
-# Initialize .privacy/config.json (rpcUrl, network)
 npm run cli -- init
-
-# Or build CLI and run manually
-npm run build:cli
-node packages/cli/dist/index.js init
 ```
 
-Other commands:
-
+**Mainnet (Requires Attention):**
 ```bash
-npm run cli -- shield <amount> <token> [--backend mock|shadowwire]
-npm run cli -- transfer <recipient> <amount> [--backend mock|shadowwire]
-npm run cli -- verify <proof-hex-or-path> [--public-inputs a,b,c]
+npm run cli -- init --network mainnet-beta --rpc-url https://api.mainnet-beta.solana.com
 ```
 
-## Demo app
+### Commands
 
-Run the Next.js demo (Phantom wallet, shield/transfer/verify via API routes):
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `shield` | `npm run cli -- shield <amount> <token>` | Deposit funds into the privacy pool. |
+| `transfer`| `npm run cli -- transfer <recipient> <amount>`| Execute a private transfer to another address. |
+| `unshield`| `npm run cli -- unshield <amount> <token>` | Withdraw funds from the privacy pool to your wallet. |
+| `verify`  | `npm run cli -- verify <proof-hex>` | Verify a ZK proof against the backend. |
 
+**Pro Tip**: Use `--backend shadowwire` to use the production privacy provider, or `--backend mock` for local testing without real funds.
+
+---
+
+## 🌐 Demo Application (Next.js)
+
+The demo app provides a beautiful UI for shielding, transferring, and verifying transactions.
+
+### 1. Environment Setup
+Copy the example environment file and configure your settings:
+```bash
+cp .env.example apps/demo/.env.local
+```
+Edit `apps/demo/.env.local` to set your `RPC_URL` and `NETWORK`.
+
+### 2. Run Locally
 ```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) in your browser. Ensure your Phantom wallet is set to the correct network (Devnet or Mainnet) before connecting.
 
-Then open [http://localhost:3000](http://localhost:3000). Optional env: copy `.env.example` to `apps/demo/.env.local` and set `RPC_URL`, `SHADOWWIRE_API_KEY`, `SHADOWWIRE_WALLET` if needed.
+---
 
-## Solana program (Anchor)
+## 🛠️ Software Development Kit (SDK)
 
-Minimal Anchor program under `programs/privacy_devkit`. Deploy to devnet:
+Integrate privacy features directly into your own Solana applications.
 
-1. Install [Rust](https://rustup.rs), [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools), [Anchor](https://www.anchor-lang.com/docs/installation).
-2. Configure devnet: `solana config set --url devnet` and fund wallet: `solana airdrop 2`.
-3. Build: `anchor build`.
-4. (First time) Update `declare_id!` in `programs/privacy_devkit/src/lib.rs` and `[programs.devnet]` in `Anchor.toml` with the program ID from `anchor keys list`.
-5. Deploy: `anchor deploy --provider.cluster devnet`.
+### Installation
+```bash
+npm install @solana-privacy/sdk
+```
 
-## Environment variables
+### Usage Example
+```typescript
+import { PrivacyClient } from '@solana-privacy/sdk';
 
-| Variable | Description |
-|----------|-------------|
-| `RPC_URL` | Solana RPC URL (default: devnet) |
-| `NETWORK` | Unused; project is devnet-only |
-| `SHADOWWIRE_API_KEY` | Optional; when set with `SHADOWWIRE_WALLET`, SDK can use ShadowWire backend |
-| `SHADOWWIRE_WALLET` | Wallet address for ShadowWire deposit/withdraw/transfer |
+const client = new PrivacyClient({
+  network: 'devnet',
+  backend: 'shadowwire' // or 'mock' for testing
+});
 
-For the demo app, use `apps/demo/.env.local` (see `.env.example` at repo root).
+// Shield 1 SOL
+const result = await client.shieldAmount(1, 'SOL');
+console.log('Shield Transaction:', result.txId);
 
-## License
+// Private Transfer
+await client.createPrivateTransfer('RecipientAddress...', 0.5);
+```
 
-MIT
+---
+
+## 🔒 Security & Best Practices
+
+1. **Environment Variables**: Never commit your `.env.local` or `.privacy/config.json` files. They are already added to `.gitignore`.
+2. **Private Keys**: Avoid hardcoding private keys. Use environment variables like `SOLANA_PRIVATE_KEY` for the CLI.
+3. **Small Steps**: When moving to Mainnet, always test with small amounts (e.g., 0.01 SOL) first.
+4. **ShadowWire Integration**: Ensure you have valid ShadowWire credentials for production mainnet use.
+
+---
+
+## 📜 License
+
+MIT License. See [LICENSE](LICENSE) for details.
