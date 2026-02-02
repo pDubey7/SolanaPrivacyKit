@@ -83,11 +83,12 @@ export class ShadowWireBackend implements PrivateTransferProvider, ZKVerifier {
 
   async createPrivateTransfer(recipient: string, amount: number): Promise<TransferResult> {
     this.assertToken("SOL"); // default; could accept token param - our interface only has recipient, amount
-    const amountHuman = TokenUtils.fromSmallestUnit(amount, "SOL");
+    // amount is in human units (e.g. 1.5 SOL) coming from the SDK interface.
+    // ShadowWireClient.transfer expects human units (it performs toSmallestUnit internally).
     const res = await this.client.transfer({
       sender: this.wallet,
       recipient,
-      amount: amountHuman,
+      amount: amount, // Pass human amount directly
       token: "SOL",
       type: "internal",
     });
@@ -99,15 +100,25 @@ export class ShadowWireBackend implements PrivateTransferProvider, ZKVerifier {
 
   async unshieldAmount(amount: number, token: string): Promise<UnshieldResult> {
     this.assertToken(token);
+    // amount is in human units. API likely expects smallest unit (consistent with deposit).
+    const amountLamports = TokenUtils.toSmallestUnit(amount, token);
     const res = await this.client.withdraw({
       wallet: this.wallet,
-      amount,
+      amount: amountLamports,
     });
     return {
       success: res.success,
       signature: res.tx_signature,
       txId: res.tx_signature,
+      unsignedTransaction: res.unsigned_tx_base64,
     };
+  }
+
+  async getShieldedBalance(token: string): Promise<number> {
+    this.assertToken(token);
+    // client.getBalance returns PoolBalance { available: number (lamports), ... }
+    const res = await this.client.getBalance(this.wallet, token);
+    return TokenUtils.fromSmallestUnit(res.available, token);
   }
 
   async verifyProof(proof: string | Buffer, publicInputs: string[]): Promise<boolean> {

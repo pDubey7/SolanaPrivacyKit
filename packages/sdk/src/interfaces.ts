@@ -19,6 +19,8 @@ export interface UnshieldResult {
   success: boolean;
   txId?: string;
   signature?: string;
+  /** Base64-encoded unsigned transaction for withdrawals (if manual signing needed) */
+  unsignedTransaction?: string;
 }
 
 /**
@@ -28,6 +30,7 @@ export interface PrivateTransferProvider {
   shieldAmount(amount: number, token: string): Promise<ShieldResult>;
   createPrivateTransfer(recipient: string, amount: number): Promise<TransferResult>;
   unshieldAmount(amount: number, token: string): Promise<UnshieldResult>;
+  getShieldedBalance(token: string): Promise<number>;
 }
 
 /**

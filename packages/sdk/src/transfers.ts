@@ -26,3 +26,10 @@ export async function createPrivateTransfer(
 export async function unshieldAmount(amount: number, token: string): Promise<UnshieldResult> {
   return getDefaultClient().backend.unshieldAmount(amount, token);
 }
+
+/**
+ * Get the shielded balance for a token (uses client backend).
+ */
+export async function getShieldedBalance(token: string): Promise<number> {
+  return getDefaultClient().backend.getShieldedBalance(token);
+}

@@ -11,6 +11,7 @@ if (typeof require === "undefined") {
 import {
   shieldAmount,
   createPrivateTransfer,
+  unshieldAmount,
   verifyZKProof,
   loadFromEnv,
   DEFAULT_RPC_URL,
@@ -20,8 +21,49 @@ import {
   type Config,
 } from "@privacy-devkit/sdk";
 import { loadConfig, writeConfig } from "./config-loader.js";
+import { Connection, Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
 
 const program = new Command();
+
+async function signAndSend(unsignedTx: string, config: Config) {
+  const privateKey = process.env.SOLANA_PRIVATE_KEY;
+  if (!privateKey) {
+    console.log(chalk.yellow("\n⚠️  No private key found (SOLANA_PRIVATE_KEY is empty)."));
+    console.log(chalk.gray("To auto-sign, run: export SOLANA_PRIVATE_KEY=your_key"));
+    console.log(chalk.gray("Or manually sign this:"), unsignedTx);
+    return;
+  }
+
+  try {
+    const keypair = Keypair.fromSecretKey(bs58.decode(privateKey));
+    const connection = new Connection(config.rpcUrl, "confirmed");
+    const txBuffer = Buffer.from(unsignedTx, "base64");
+
+    let tx;
+    try {
+      tx = VersionedTransaction.deserialize(new Uint8Array(txBuffer));
+    } catch {
+      tx = Transaction.from(txBuffer);
+    }
+
+    console.log(chalk.cyan("Signing and sending transaction..."));
+
+    let signature;
+    if (tx instanceof VersionedTransaction) {
+      tx.sign([keypair]);
+      signature = await connection.sendRawTransaction(tx.serialize());
+    } else {
+      signature = await connection.sendTransaction(tx, [keypair]);
+    }
+
+    console.log(chalk.cyan("Waiting for confirmation..."));
+    await connection.confirmTransaction(signature, "confirmed");
+    console.log(chalk.green("Transaction confirmed!"), chalk.gray("Sig:"), signature);
+  } catch (err) {
+    console.error(chalk.red("Signing error:"), err instanceof Error ? err.message : err);
+  }
+}
 
 function getConfig(opts: {
   rpcUrl?: string;
@@ -109,6 +151,7 @@ program
         console.error(chalk.red("Error: amount must be a positive number"));
         process.exit(1);
       }
+      const config = getConfig(opts);
       ensureBackend(opts);
       try {
         const result = await shieldAmount(amount, token);
@@ -116,8 +159,43 @@ program
         console.log(chalk.gray("  success:"), result.success);
         if (result.txId) console.log(chalk.gray("  txId:"), result.txId);
         if (result.commitment) console.log(chalk.gray("  commitment:"), result.commitment);
-        if (result.unsignedTransaction)
-          console.log(chalk.gray("  unsignedTransaction:"), "(base64, sign and send)");
+        if (result.unsignedTransaction) {
+          await signAndSend(result.unsignedTransaction, config);
+        }
+      } catch (err) {
+        console.error(chalk.red("Error:"), err instanceof Error ? err.message : err);
+        process.exit(1);
+      }
+    }
+  );
+
+program
+  .command("unshield <amount> <token>")
+  .description("Unshield (withdraw) amount of token")
+  .option("--backend <name>", "Backend: mock | shadowwire", "mock")
+  .option("--rpc-url <url>", "Override RPC URL")
+  .option("--network <name>", "Override network: devnet | mainnet-beta")
+  .action(
+    async (
+      amountStr: string,
+      token: string,
+      opts: { backend?: string; rpcUrl?: string; network?: string }
+    ) => {
+      const amount = Number(amountStr);
+      if (Number.isNaN(amount) || amount <= 0) {
+        console.error(chalk.red("Error: amount must be a positive number"));
+        process.exit(1);
+      }
+      const config = getConfig(opts);
+      ensureBackend(opts);
+      try {
+        const result = await unshieldAmount(amount, token);
+        console.log(chalk.green("Unshield result:"));
+        console.log(chalk.gray("  success:"), result.success);
+        if (result.txId) console.log(chalk.gray("  txId:"), result.txId);
+        if (result.unsignedTransaction) {
+          await signAndSend(result.unsignedTransaction, config);
+        }
       } catch (err) {
         console.error(chalk.red("Error:"), err instanceof Error ? err.message : err);
         process.exit(1);

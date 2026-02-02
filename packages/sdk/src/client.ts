@@ -48,7 +48,7 @@ export class PrivacyClient {
     this.config = config;
     this.connection = new Connection(config.rpcUrl);
     this.backend =
-      config.shadowwireApiKey && config.shadowwireWallet
+      config.shadowwireWallet
         ? createBackend("shadowwire", config)
         : new MockBackend();
   }

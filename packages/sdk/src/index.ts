@@ -17,6 +17,7 @@ export {
   shieldAmount,
   createPrivateTransfer,
   unshieldAmount,
+  getShieldedBalance,
   type ShieldResult,
   type TransferResult,
   type UnshieldResult,

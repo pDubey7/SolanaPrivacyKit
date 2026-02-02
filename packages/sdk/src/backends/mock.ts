@@ -39,6 +39,11 @@ export class MockBackend implements PrivateTransferProvider, ZKVerifier {
     };
   }
 
+  async getShieldedBalance(token: string): Promise<number> {
+    console.log(`[MockBackend] Returning mock balance for token=${token}`);
+    return 100; // Mock balance
+  }
+
   async verifyProof(proof: string | Buffer, publicInputs: string[]): Promise<boolean> {
     const valid = validateProofFormat(proof, publicInputs);
     console.log(
